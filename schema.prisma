@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  phone     String?
+  role      String   @default("customer") // customer | admin
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings    Booking[]
+  foodOrders  FoodOrder[]
+  reviews     Review[]
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // Single | Deluxe | Suite | Presidential
+  price       Float
+  capacity    Int
+  description String
+  amenities   String   // comma-separated: WiFi,AC,TV,Mini Bar
+  images      String   // comma-separated image URLs
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model FoodItem {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // MoMo | Noodles | Rice | Curry | Drinks | Desserts | Snacks
+  price       Float
+  description String
+  image       String
+  isVeg       Boolean  @default(false)
+  isAvailable Boolean  @default(true)
+  rating      Float    @default(0)
+  orderCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems FoodOrderItem[]
+  reviews    Review[]
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  userId      String
+  roomId      String
+  checkIn     DateTime
+  checkOut    DateTime
+  guests      Int      @default(1)
+  status      String   @default("confirmed") // confirmed | checked_in | checked_out | cancelled
+  totalPrice  Float
+  paymentMethod String @default("pay_at_hotel")
+  paymentStatus String @default("pending") // pending | paid | refunded
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User   @relation(fields: [userId], references: [id])
+  room Room   @relation(fields: [roomId], references: [id])
+}
+
+model FoodOrder {
+  id            String   @id @default(cuid())
+  userId        String
+  roomNumber    String?
+  status        String   @default("preparing") // preparing | on_the_way | delivered | cancelled
+  totalAmount   Float
+  deliveryTime  String?  // estimated delivery time
+  paymentMethod String   @default("pay_at_hotel")
+  paymentStatus String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id])
+  items      FoodOrderItem[]
+}
+
+model FoodOrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  foodItemId String
+  quantity   Int
+  price      Float
+
+  order    FoodOrder @relation(fields: [orderId], references: [id])
+  foodItem FoodItem  @relation(fields: [foodItemId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  rating    Int      // 1-5
+  comment   String
+  type      String   // room | food
+  roomId    String?
+  foodItemId String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  room      Room?    @relation(fields: [roomId], references: [id])
+  foodItem  FoodItem? @relation(fields: [foodItemId], references: [id])
+}
