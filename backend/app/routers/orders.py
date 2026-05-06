@@ -37,7 +37,6 @@ async def build_order_response(order: Order, db: AsyncSession) -> OrderResponse:
 async def create_order(
     data: OrderCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User | None = None,
 ):
     if not data.items:
         raise HTTPException(status_code=400, detail="Order must have at least one item")
@@ -49,7 +48,7 @@ async def create_order(
         order_type=data.order_type,
         customer_name=data.customer_name,
         special_instructions=data.special_instructions,
-        staff_id=current_user.id if current_user else None,
+        staff_id=None,
         status=OrderStatus.PENDING,
     )
     db.add(order)
