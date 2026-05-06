@@ -1,0 +1,30 @@
+[project]
+name = "hotel-restaurant-api"
+version = "1.0.0"
+description = "Hotel & Restaurant Management System - FastAPI Backend"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlalchemy>=2.0.0",
+    "aiosqlite>=0.20.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=4.0.0,<4.1.0",
+    "python-multipart>=0.0.9",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.5.0",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
